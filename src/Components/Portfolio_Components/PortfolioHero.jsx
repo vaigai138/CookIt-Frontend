@@ -1,5 +1,4 @@
 import React from "react";
-import logo from '../../assets/logo.png'
 
 const PortfolioHero = () => {
   return (
@@ -23,33 +22,8 @@ const PortfolioHero = () => {
         <div className="absolute bottom-[80px] right-[20px] w-2 h-2 bg-gray-400 rounded-full lg:right-[24%]"></div>
       </div>
 
-      {/* Top Menu (Matching the typography and layout of the image) */}
-      <div className="flex justify-between items-center px-6 py-6 z-10 lg:px-24">
-        {/* Menu on the left - Changed from font-light to font-normal for better balance */}
-        <a
-          href="/"
-          title="Home"
-          className="text-gray-900 text-lg tracking-wider cursor-pointer font-normal"
-        >
-          Home
-        </a>
-
-        {/* Brand Name (Pocky) - Kept font-normal as it was */}
-        {/* <h1 className="text-xl md:text-2xl font-normal text-gray-900 tracking-widest uppercase">CookIT</h1> */}
-        <img src={logo} alt="" className="w-20 h-12" />
-
-        {/* Contact Us on the right - Changed from font-light to font-normal */}
-        <a
-          href="/contact"
-          title="Contact"
-          className="text-gray-900 text-lg tracking-wider cursor-pointer font-normal"
-        >
-          Contact Us
-        </a>
-      </div>
-
       {/* Hero Content (Central and dominant typography) */}
-      <div className="flex-1 flex flex-col justify-center items-center text-center px-6 relative z-10">
+      <div className="flex-1 flex flex-col justify-center items-center text-center px-6 relative z-10 pt-16">
         <h2 className="text-5xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold text-gray-900 leading-none tracking-tight mb-4 max-w-6xl">
           {/* *** FONT WEIGHT ADJUSTED HERE: font-extrabold -> font-bold *** */}
           Elevating your brand with exceptional
