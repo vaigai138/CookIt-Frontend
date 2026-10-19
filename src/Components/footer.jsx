@@ -6,15 +6,15 @@ import { FaLinkedinIn, FaInstagram, FaWhatsapp } from "react-icons/fa";
 // ── Footer config ──
 // TODO: replace contact details + social URLs with the real ones.
 const CONTACT = {
-  email: "hello@cookit.in",
-  phone: "+91 00000 00000",
+  email: "hello@cookinfo.tech",
+  phone: "+91 9597337699",
   location: "Tamil Nadu, India",
 };
 
 const SOCIALS = [
-  { name: "LinkedIn", href: "https://linkedin.com/", icon: FaLinkedinIn },
-  { name: "Instagram", href: "https://instagram.com/", icon: FaInstagram },
-  { name: "WhatsApp", href: "https://wa.me/", icon: FaWhatsapp },
+  { name: "LinkedIn", href: "https://www.linkedin.com/company/cook-info-tech/", icon: FaLinkedinIn },
+  { name: "Instagram", href: "https://www.instagram.com/cookinfo.tech?utm_source=ig_web_button_share_sheet&mdxt=ZDNlZDc0MzIxNw==", icon: FaInstagram },
+  { name: "WhatsApp", href: "https://wa.me/9597337699", icon: FaWhatsapp },
 ];
 
 const SERVICE_LINKS = [
