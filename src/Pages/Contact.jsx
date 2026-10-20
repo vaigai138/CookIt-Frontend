@@ -10,9 +10,9 @@ const SERVICE_OPTIONS = ["Business Website", "Custom Software", "Mobile Applicat
 
 // TODO: replace with real contact details (kept in sync with the footer).
 const CONTACT = {
-  email: "hello@cookit.in",
-  phone: "+91 00000 00000",
-  location: "Chennai, India",
+  email: "hello@cookinfo.tech",
+  phone: "+91 9597337699",
+  location: "Tamil Nadu, India",
   hours: "Mon – Sat, 9am – 7pm",
 };
 
