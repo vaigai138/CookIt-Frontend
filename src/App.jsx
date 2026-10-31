@@ -11,6 +11,8 @@ import Contact from "./Pages/Contact";
 import SolutionBuilder from "./Pages/SolutionBuilder";
 import Blog from "./Pages/Blog";
 import BlogPost from "./Pages/BlogPost";
+import Posts from "./Pages/Posts";
+import PostDetail from "./Pages/PostDetail";
 import Privacy from "./Pages/Privacy";
 import Terms from "./Pages/Terms";
 import Placeholder from "./Pages/Placeholder";
@@ -22,6 +24,7 @@ const AdminDashboard = lazy(() => import("./Pages/admin/Dashboard"));
 const BlogEditor = lazy(() => import("./Pages/admin/BlogEditor"));
 const AdminPageMeta = lazy(() => import("./Pages/admin/PageMeta"));
 const AdminSettings = lazy(() => import("./Pages/admin/Settings"));
+const AdminPosts = lazy(() => import("./Pages/admin/Posts"));
 
 const AdminFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -41,6 +44,7 @@ function App() {
         <Route path="/admin/edit/:slug" element={<AdminRoute><Suspense fallback={<AdminFallback />}><BlogEditor /></Suspense></AdminRoute>} />
         <Route path="/admin/seo" element={<AdminRoute><Suspense fallback={<AdminFallback />}><AdminPageMeta /></Suspense></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><Suspense fallback={<AdminFallback />}><AdminSettings /></Suspense></AdminRoute>} />
+        <Route path="/admin/posts" element={<AdminRoute><Suspense fallback={<AdminFallback />}><AdminPosts /></Suspense></AdminRoute>} />
 
         {/* Public site */}
         <Route element={<Layout />}>
@@ -53,6 +57,8 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/posts" element={<Posts />} />
+          <Route path="/posts/:id" element={<PostDetail />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<Placeholder title="Page not found" subtitle="The page you're looking for doesn't exist or has moved." />} />

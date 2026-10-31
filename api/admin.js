@@ -205,6 +205,62 @@ async function handleChangePassword(req, res) {
   res.status(200).json({ success: true, message: "Updated. Takes effect after redeployment (~60s)." });
 }
 
+// ── Posts (Instagram comment-automation link pages) ──
+// Stored in public/content/posts.json (served to the site; redeploy ~60s to publish).
+
+async function handlePostsGet(req, res) {
+  const data = await ghGet("public/content/posts.json");
+  if (!data) return res.status(200).json({ posts: [] });
+  res.status(200).json(JSON.parse(Buffer.from(data.content, "base64").toString("utf-8")));
+}
+
+async function handlePostsSave(req, res) {
+  const { posts } = req.body;
+  if (!Array.isArray(posts)) return res.status(400).json({ error: "posts array required" });
+  const existing = await ghGet("public/content/posts.json");
+  await ghPut("public/content/posts.json", JSON.stringify({ posts }, null, 2), "Update posts", existing?.sha);
+  res.status(200).json({ success: true });
+}
+
+// Instagram access token — prefer the auto-refreshed one in the repo, else env.
+async function getIgToken() {
+  try {
+    const data = await ghGet("content/secrets/ig-token.json");
+    if (data) {
+      const j = JSON.parse(Buffer.from(data.content, "base64").toString("utf-8"));
+      if (j && j.access_token) return j.access_token;
+    }
+  } catch {}
+  return process.env.IG_ACCESS_TOKEN || "";
+}
+
+// List the connected Instagram account's recent media (for the Posts picker).
+async function handleIgMedia(req, res) {
+  const token = await getIgToken();
+  if (!token) return res.status(400).json({ error: "Instagram is not connected on the server." });
+  try {
+    const fields = "id,caption,media_type,media_product_type,media_url,thumbnail_url,permalink,timestamp";
+    const url = `https://graph.instagram.com/v21.0/me/media?fields=${fields}&limit=50&access_token=${encodeURIComponent(token)}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (!r.ok) return res.status(502).json({ error: (d.error && d.error.message) || "Instagram API error" });
+    const media = (d.data || [])
+      .filter((m) => m.permalink)
+      .map((m) => ({
+        id: m.id,
+        permalink: m.permalink,
+        caption: String(m.caption || "").slice(0, 140),
+        thumb: m.thumbnail_url || m.media_url || "",
+        type: m.media_product_type || m.media_type || "",
+        timestamp: m.timestamp || "",
+      }));
+    res.status(200).json({ media });
+  } catch (e) {
+    console.error("ig-media error", e);
+    res.status(500).json({ error: "Failed to load Instagram media." });
+  }
+}
+
 // ── Router ──
 
 export default async function handler(req, res) {
@@ -226,6 +282,9 @@ export default async function handler(req, res) {
       case "change-password": return handleChangePassword(req, res);
       case "page-meta":       return handleGetPageMeta(req, res);
       case "save-page-meta":  return handleSavePageMeta(req, res);
+      case "posts-get":       return handlePostsGet(req, res);
+      case "posts-save":      return handlePostsSave(req, res);
+      case "ig-media":        return handleIgMedia(req, res);
       default:                return res.status(400).json({ error: "Invalid action" });
     }
   } catch (error) {

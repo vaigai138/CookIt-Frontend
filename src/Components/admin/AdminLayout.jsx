@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FileText, PlusCircle, Search, Settings, LogOut, Menu } from "lucide-react";
+import { FileText, PlusCircle, Search, Settings, LogOut, Menu, Film } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "All Posts", path: "/admin", icon: FileText },
   { label: "New Post", path: "/admin/new", icon: PlusCircle },
+  { label: "Posts (IG automation)", path: "/admin/posts", icon: Film },
   { label: "SEO Meta Tags", path: "/admin/seo", icon: Search },
   { label: "Settings", path: "/admin/settings", icon: Settings },
 ];
