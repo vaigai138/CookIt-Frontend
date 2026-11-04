@@ -205,6 +205,105 @@ async function handleChangePassword(req, res) {
   res.status(200).json({ success: true, message: "Updated. Takes effect after redeployment (~60s)." });
 }
 
+// ── Leads (website enquiry forms → admin). Stored privately in content/leads.json. ──
+
+async function handleSubmitLead(req, res) {
+  const { name, email, phone, service, message, source } = req.body || {};
+  if (!name || !String(name).trim()) return res.status(400).json({ error: "Name is required" });
+  if (!String(email || "").trim() && !String(phone || "").trim()) return res.status(400).json({ error: "Email or phone is required" });
+  const entry = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name: String(name).trim().slice(0, 200),
+    email: String(email || "").trim().slice(0, 200),
+    phone: String(phone || "").trim().slice(0, 40),
+    service: String(service || "").trim().slice(0, 120),
+    message: String(message || "").trim().slice(0, 4000),
+    source: String(source || "Website").trim().slice(0, 60),
+    status: "new",
+    submittedAt: new Date().toISOString(),
+  };
+  const existing = await ghGet("content/leads.json");
+  const list = existing ? JSON.parse(Buffer.from(existing.content, "base64").toString("utf-8")) : [];
+  list.unshift(entry);
+  await ghPut("content/leads.json", JSON.stringify(list, null, 2), `New lead: ${entry.name}`, existing?.sha);
+  res.status(200).json({ success: true });
+}
+
+async function handleListLeads(req, res) {
+  const data = await ghGet("content/leads.json");
+  if (!data) return res.status(200).json([]);
+  res.status(200).json(JSON.parse(Buffer.from(data.content, "base64").toString("utf-8")));
+}
+
+async function handleUpdateLead(req, res) {
+  const { id, status } = req.body || {};
+  if (!id) return res.status(400).json({ error: "id required" });
+  const allowed = ["new", "contacted", "won", "lost"];
+  if (!allowed.includes(status)) return res.status(400).json({ error: "invalid status" });
+  const existing = await ghGet("content/leads.json");
+  if (!existing) return res.status(404).json({ error: "Not found" });
+  const list = JSON.parse(Buffer.from(existing.content, "base64").toString("utf-8"));
+  const lead = list.find((l) => l.id === id);
+  if (!lead) return res.status(404).json({ error: "Not found" });
+  lead.status = status;
+  await ghPut("content/leads.json", JSON.stringify(list, null, 2), `Lead ${id} -> ${status}`, existing.sha);
+  res.status(200).json({ success: true });
+}
+
+async function handleDeleteLead(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: "id required" });
+  const existing = await ghGet("content/leads.json");
+  if (!existing) return res.status(404).json({ error: "Not found" });
+  let list = JSON.parse(Buffer.from(existing.content, "base64").toString("utf-8"));
+  list = list.filter((l) => l.id !== id);
+  await ghPut("content/leads.json", JSON.stringify(list, null, 2), `Remove lead ${id}`, existing.sha);
+  res.status(200).json({ success: true });
+}
+
+// ── Careers applications. Stored privately in content/job-applications.json. ──
+
+async function handleSubmitApplication(req, res) {
+  const { name, email, phone, role, portfolio, experienceLevel, employmentType, skills, notes } = req.body || {};
+  if (!name || !String(name).trim()) return res.status(400).json({ error: "Name is required" });
+  if (!String(email || "").trim() && !String(phone || "").trim()) return res.status(400).json({ error: "Email or phone is required" });
+  const entry = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name: String(name).trim().slice(0, 200),
+    email: String(email || "").trim().slice(0, 200),
+    phone: String(phone || "").trim().slice(0, 40),
+    role: String(role || "").trim().slice(0, 80),
+    portfolio: String(portfolio || "").trim().slice(0, 500),
+    experienceLevel: String(experienceLevel || "").trim().slice(0, 50),
+    employmentType: String(employmentType || "").trim().slice(0, 30),
+    skills: String(skills || "").trim().slice(0, 500),
+    notes: String(notes || "").trim().slice(0, 3000),
+    submittedAt: new Date().toISOString(),
+  };
+  const existing = await ghGet("content/job-applications.json");
+  const list = existing ? JSON.parse(Buffer.from(existing.content, "base64").toString("utf-8")) : [];
+  list.unshift(entry);
+  await ghPut("content/job-applications.json", JSON.stringify(list, null, 2), `New application: ${entry.name}`, existing?.sha);
+  res.status(200).json({ success: true });
+}
+
+async function handleListApplications(req, res) {
+  const data = await ghGet("content/job-applications.json");
+  if (!data) return res.status(200).json([]);
+  res.status(200).json(JSON.parse(Buffer.from(data.content, "base64").toString("utf-8")));
+}
+
+async function handleDeleteApplication(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: "id required" });
+  const existing = await ghGet("content/job-applications.json");
+  if (!existing) return res.status(404).json({ error: "Not found" });
+  let list = JSON.parse(Buffer.from(existing.content, "base64").toString("utf-8"));
+  list = list.filter((a) => a.id !== id);
+  await ghPut("content/job-applications.json", JSON.stringify(list, null, 2), `Remove application ${id}`, existing.sha);
+  res.status(200).json({ success: true });
+}
+
 // ── Posts (Instagram comment-automation link pages) ──
 // Stored in public/content/posts.json (served to the site; redeploy ~60s to publish).
 
@@ -269,6 +368,8 @@ export default async function handler(req, res) {
 
   try {
     if (action === "login") return handleLogin(req, res);
+    if (action === "submit-lead") return handleSubmitLead(req, res);
+    if (action === "submit-application") return handleSubmitApplication(req, res);
 
     try { verifyToken(req); } catch { return res.status(401).json({ error: "Unauthorized" }); }
 
@@ -285,6 +386,11 @@ export default async function handler(req, res) {
       case "posts-get":       return handlePostsGet(req, res);
       case "posts-save":      return handlePostsSave(req, res);
       case "ig-media":        return handleIgMedia(req, res);
+      case "leads":           return handleListLeads(req, res);
+      case "update-lead":     return handleUpdateLead(req, res);
+      case "delete-lead":     return handleDeleteLead(req, res);
+      case "applications":    return handleListApplications(req, res);
+      case "delete-application": return handleDeleteApplication(req, res);
       default:                return res.status(400).json({ error: "Invalid action" });
     }
   } catch (error) {

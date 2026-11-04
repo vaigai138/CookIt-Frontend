@@ -13,6 +13,7 @@ import Blog from "./Pages/Blog";
 import BlogPost from "./Pages/BlogPost";
 import Posts from "./Pages/Posts";
 import PostDetail from "./Pages/PostDetail";
+import Careers from "./Pages/Careers";
 import Privacy from "./Pages/Privacy";
 import Terms from "./Pages/Terms";
 import Placeholder from "./Pages/Placeholder";
@@ -25,6 +26,8 @@ const BlogEditor = lazy(() => import("./Pages/admin/BlogEditor"));
 const AdminPageMeta = lazy(() => import("./Pages/admin/PageMeta"));
 const AdminSettings = lazy(() => import("./Pages/admin/Settings"));
 const AdminPosts = lazy(() => import("./Pages/admin/Posts"));
+const AdminLeads = lazy(() => import("./Pages/admin/Leads"));
+const AdminApplications = lazy(() => import("./Pages/admin/Applications"));
 
 const AdminFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -45,6 +48,8 @@ function App() {
         <Route path="/admin/seo" element={<AdminRoute><Suspense fallback={<AdminFallback />}><AdminPageMeta /></Suspense></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><Suspense fallback={<AdminFallback />}><AdminSettings /></Suspense></AdminRoute>} />
         <Route path="/admin/posts" element={<AdminRoute><Suspense fallback={<AdminFallback />}><AdminPosts /></Suspense></AdminRoute>} />
+        <Route path="/admin/leads" element={<AdminRoute><Suspense fallback={<AdminFallback />}><AdminLeads /></Suspense></AdminRoute>} />
+        <Route path="/admin/applications" element={<AdminRoute><Suspense fallback={<AdminFallback />}><AdminApplications /></Suspense></AdminRoute>} />
 
         {/* Public site */}
         <Route element={<Layout />}>
@@ -59,6 +64,7 @@ function App() {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/posts" element={<Posts />} />
           <Route path="/posts/:id" element={<PostDetail />} />
+          <Route path="/careers" element={<Careers />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<Placeholder title="Page not found" subtitle="The page you're looking for doesn't exist or has moved." />} />

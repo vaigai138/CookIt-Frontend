@@ -29,6 +29,7 @@ const COMPANY_LINKS = [
   { label: "Portfolio", to: "/portfolio" },
   { label: "Blog", to: "/blog" },
   { label: "Build with AI", to: "/build" },
+  { label: "Careers", to: "/careers" },
 ];
 
 const Footer = () => {

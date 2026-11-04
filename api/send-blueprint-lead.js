@@ -1,4 +1,5 @@
 import { sendEmail, emailLayout, fieldRow, messageBlock, handleCors, esc } from "./_lib/sendEmail.js";
+import { storeLead } from "./_lib/leads.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -47,6 +48,12 @@ export default async function handler(req, res) {
       subject: `Solution Builder Lead: ${from_name} — ${a.goal || a.industry || "General"}`,
       html,
       replyTo: reply_to,
+    });
+
+    await storeLead({
+      name: from_name, email: reply_to, phone: phone_number,
+      service: a.goal || a.industry || "", source: "Solution Builder",
+      message: [a.industry && `Industry: ${a.industry}`, a.size && `Size: ${a.size}`, a.goal && `Goal: ${a.goal}`, a.challenges && `Challenges: ${a.challenges}`, a.tools && `Tools: ${a.tools}`].filter(Boolean).join("\n"),
     });
 
     res.status(200).json({ success: true });

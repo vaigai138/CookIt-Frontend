@@ -1,4 +1,5 @@
 import { sendEmail, emailLayout, fieldRow, messageBlock, handleCors, esc } from "./_lib/sendEmail.js";
+import { storeLead } from "./_lib/leads.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -34,6 +35,9 @@ export default async function handler(req, res) {
       html,
       replyTo: reply_to,
     });
+
+    // Also store it in the admin Leads section (best-effort).
+    await storeLead({ name: from_name, email: reply_to, phone: phone_number, service: interest, message, source: "Contact form" });
 
     res.status(200).json({ success: true });
   } catch (error) {

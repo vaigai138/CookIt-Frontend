@@ -1,4 +1,5 @@
 import { sendEmail, emailLayout, fieldRow, messageBlock, handleCors, esc } from "./_lib/sendEmail.js";
+import { storeLead } from "./_lib/leads.js";
 
 export default async function handler(req, res) {
   if (handleCors(req, res)) return;
@@ -28,6 +29,8 @@ export default async function handler(req, res) {
       html,
       replyTo: reply_to,
     });
+
+    await storeLead({ name: from_name, email: reply_to, phone: phone_number, service: interest, message, source: "Chatbot" });
 
     res.status(200).json({ success: true });
   } catch (error) {
